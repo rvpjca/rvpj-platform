@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { AppProviders } from "@/components/providers/app-providers";
-import { TargetCursor } from "@/components/ui/target-cursor";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +44,6 @@ export default function RootLayout({
       >
         <AppProviders>
           {children}
-          <TargetCursor />
         </AppProviders>
       </body>
     </html>
