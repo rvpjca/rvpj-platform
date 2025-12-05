@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R V P J & Co. - Platform Documentation</title>
+    <meta name="description" content="Complete documentation for R V P J & Co. Platform in English and Gujarati">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #0F766E;
+            --primary-dark: #115E59;
+            --bg-light: #F8FAFC;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .lang-switcher {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        .sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+        .sidebar h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .sidebar ul {
+            list-style: none;
+        }
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+        .sidebar a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        h2 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        h3 {
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+        code {
+            background: var(--bg-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        .warning {
+            background: #FEF3C7;
+            border-left-color: #F59E0B;
+        }
+        .info {
+            background: #DBEAFE;
+            border-left-color: #3B82F6;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        @media print {
+            .header, .sidebar {
+                display: none;
+            }
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">📚 R V P J & Co. Documentation</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+                <button class="lang-btn" onclick="switchLanguage('gu')">ગુજરાતી</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3 data-en="Navigation" data-gu="નેવિગેશન">Navigation</h3>
+            <ul id="nav-menu">
+                <li><a href="#overview" class="nav-link active" data-en="Overview" data-gu="વિહંગાવલોકન">Overview</a></li>
+                <li><a href="#features" class="nav-link" data-en="Features" data-gu="સુવિધાઓ">Features</a></li>
+                <li><a href="#getting-started" class="nav-link" data-en="Getting Started" data-gu="શરૂઆત કરો">Getting Started</a></li>
+                <li><a href="#admin-guide" class="nav-link" data-en="Admin Guide" data-gu="એડમિન માર્ગદર્શિકા">Admin Guide</a></li>
+                <li><a href="#client-guide" class="nav-link" data-en="Client Guide" data-gu="ક્લાયંટ માર્ગદર્શિકા">Client Guide</a></li>
+                <li><a href="#calculators" class="nav-link" data-en="Calculators" data-gu="કેલ્ક્યુલેટર">Calculators</a></li>
+                <li><a href="#support" class="nav-link" data-en="Support" data-gu="સહાયતા">Support</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <!-- Overview -->
+            <section id="overview" class="section active">
+                <h1 data-en="Platform Documentation" data-gu="પ્લેટફોર્મ દસ્તાવેજીકરણ">Platform Documentation</h1>
+                <p data-en="Welcome to R V P J & Co. CMS Platform documentation. This comprehensive guide will help you understand and use all features of the platform." data-gu="R V P J & Co. CMS પ્લેટફોર્મ દસ્તાવેજીકરણમાં આપનું સ્વાગત છે. આ વ્યાપક માર્ગદર્શિકા તમને પ્લેટફોર્મની બધી સુવિધાઓ સમજવા અને ઉપયોગ કરવામાં મદદ કરશે.">Welcome to R V P J & Co. CMS Platform documentation.</p>
+                
+                <div class="card info">
+                    <p data-en="<strong>Current Version:</strong> 1.0.0" data-gu="<strong>વર્તમાન સંસ્કરણ:</strong> 1.0.0"><strong>Current Version:</strong> 1.0.0</p>
+                    <p data-en="<strong>Last Updated:</strong> December 2024" data-gu="<strong>છેલ્લું અપડેટ:</strong> ડિસેમ્બર 2024"><strong>Last Updated:</strong> December 2024</p>
+                </div>
+                
+                <h2 data-en="What is this platform?" data-gu="આ પ્લેટફોર્મ શું છે?">What is this platform?</h2>
+                <p data-en="R V P J & Co. Platform is a comprehensive content management system designed specifically for chartered accountancy firms." data-gu="R V P J & Co. પ્લેટફોર્મ ચાર્ટર્ડ એકાઉન્ટન્સી ફર્મ માટે ખાસ ડિઝાઇન કરેલ વ્યાપક સામગ્રી વ્યવસ્થાપન સિસ્ટમ છે.">R V P J & Co. Platform is a comprehensive content management system designed specifically for chartered accountancy firms.</p>
+            </section>
+
+            <!-- Features -->
+            <section id="features" class="section">
+                <h1 data-en="Platform Features" data-gu="પ્લેટફોર્મ સુવિધાઓ">Platform Features</h1>
+                
+                <h2 data-en="Public Website" data-gu="સાર્વજનિક વેબસાઇટ">Public Website</h2>
+                <ul>
+                    <li data-en="Services information pages" data-gu="સેવાઓની માહિતી પૃષ્ઠો">Services information pages</li>
+                    <li data-en="13+ Financial calculators" data-gu="13+ નાણાકીય કેલ્ક્યુલેટર">13+ Financial calculators</li>
+                    <li data-en="Knowledge bank" data-gu="જ્ઞાન બેંક">Knowledge bank</li>
+                    <li data-en="Career portal" data-gu="કારકિર્દી પોર્ટલ">Career portal</li>
+                    <li data-en="Contact forms" data-gu="સંપર્ક ફોર્મ">Contact forms</li>
+                </ul>
+                
+                <h2 data-en="Admin Dashboard" data-gu="એડમિન ડેશબોર્ડ">Admin Dashboard</h2>
+                <ul>
+                    <li data-en="User management" data-gu="વપરાશકર્તા વ્યવસ્થાપન">User management</li>
+                    <li data-en="Live chat management" data-gu="લાઇવ ચેટ વ્યવસ્થાપન">Live chat management</li>
+                    <li data-en="WhatsApp integration" data-gu="WhatsApp એકીકરણ">WhatsApp integration</li>
+                    <li data-en="Document management" data-gu="દસ્તાવેજ વ્યવસ્થાપન">Document management</li>
+                    <li data-en="Task management" data-gu="કાર્ય વ્યવસ્થાપન">Task management</li>
+                </ul>
+            </section>
+
+            <!-- Getting Started -->
+            <section id="getting-started" class="section">
+                <h1 data-en="Getting Started" data-gu="શરૂઆત કરો">Getting Started</h1>
+                
+                <h2 data-en="Login URLs" data-gu="લોગિન URL">Login URLs</h2>
+                <div class="card info">
+                    <p data-en="<strong>Public Website:</strong> https://rvpj.in" data-gu="<strong>સાર્વજનિક વેબસાઇટ:</strong> https://rvpj.in"><strong>Public Website:</strong> https://rvpj.in</p>
+                    <p data-en="<strong>Admin Login:</strong> https://rvpj.in/login" data-gu="<strong>એડમિન લોગિન:</strong> https://rvpj.in/login"><strong>Admin Login:</strong> https://rvpj.in/login</p>
+                    <p data-en="<strong>Client Login:</strong> https://rvpj.in/client-login" data-gu="<strong>ક્લાયંટ લોગિન:</strong> https://rvpj.in/client-login"><strong>Client Login:</strong> https://rvpj.in/client-login</p>
+                </div>
+            </section>
+
+            <!-- Admin Guide -->
+            <section id="admin-guide" class="section">
+                <h1 data-en="Admin Guide" data-gu="એડમિન માર્ગદર્શિકા">Admin Guide</h1>
+                <h2 data-en="User Management" data-gu="વપરાશકર્તા વ્યવસ્થાપન">User Management</h2>
+                <p data-en="Create and manage users, assign roles and permissions." data-gu="વપરાશકર્તાઓ બનાવો અને સંચાલિત કરો, ભૂમિકાઓ અને પરવાનગીઓ આપો.">Create and manage users, assign roles and permissions.</p>
+            </section>
+
+            <!-- Client Guide -->
+            <section id="client-guide" class="section">
+                <h1 data-en="Client Guide" data-gu="ક્લાયંટ માર્ગદર્શિકા">Client Guide</h1>
+                <h2 data-en="Document Upload" data-gu="દસ્તાવેજ અપલોડ">Document Upload</h2>
+                <p data-en="Upload your documents securely through the client portal." data-gu="ક્લાયંટ પોર્ટલ દ્વારા તમારા દસ્તાવેજો સુરક્ષિત રીતે અપલોડ કરો.">Upload your documents securely through the client portal.</p>
+            </section>
+
+            <!-- Calculators -->
+            <section id="calculators" class="section">
+                <h1 data-en="Financial Calculators" data-gu="નાણાકીય કેલ્ક્યુલેટર">Financial Calculators</h1>
+                <p data-en="Access 13+ free calculators for tax and investment planning." data-gu="કર અને રોકાણ આયોજન માટે 13+ મફત કેલ્ક્યુલેટર ઍક્સેસ કરો.">Access 13+ free calculators for tax and investment planning.</p>
+            </section>
+
+            <!-- Support -->
+            <section id="support" class="section">
+                <h1 data-en="Support & Contact" data-gu="સહાયતા અને સંપર્ક">Support & Contact</h1>
+                <div class="card info">
+                    <p data-en="<strong>Email:</strong> admin@rvpj.in" data-gu="<strong>ઇમેઇલ:</strong> admin@rvpj.in"><strong>Email:</strong> admin@rvpj.in</p>
+                    <p data-en="<strong>Phone:</strong> +91 9978781078" data-gu="<strong>ફોન:</strong> +91 9978781078"><strong>Phone:</strong> +91 9978781078</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Language switching
+        let currentLang = 'en';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // Update button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update all translatable elements
+            document.querySelectorAll('[data-en][data-gu]').forEach(el => {
+                const text = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-gu');
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = text;
+                } else {
+                    el.innerHTML = text;
+                }
+            });
+            
+            // Save preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Update URL hash without jumping
+            history.pushState(null, null, '#' + sectionId);
+            
+            return false;
+        }
+
+        // Setup navigation listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore language preference
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang && savedLang !== 'en') {
+                const btn = document.querySelector(`[onclick="switchLanguage('${savedLang}')"]`);
+                if (btn) btn.click();
+            }
+            
+            // Setup navigation click handlers
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('href').substring(1);
+                    showSection.call(this, sectionId);
+                });
+            });
+            
+            // Handle direct URL hash
+            if (window.location.hash) {
+                const sectionId = window.location.hash.substring(1);
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    section.classList.add('active');
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+

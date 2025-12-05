@@ -1,0 +1,715 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleKey {
+  ADMIN
+  PARTNER
+  MANAGER
+  STAFF
+  VIEWER
+  CLIENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ServiceType {
+  AUDIT_ASSURANCE
+  DIRECT_TAX
+  INDIRECT_TAX
+  CORPORATE_LAW
+  PROJECT_FINANCE
+  MANAGEMENT
+  OTHER
+}
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESPONDED
+  CLOSED
+}
+
+enum InquiryPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  BLOCKED
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+  HOLIDAY
+  WORK_FROM_HOME
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  key         RoleKey  @unique
+  name        String
+  description String?
+  permissions String[] @default([])  // Array of allowed paths e.g. ["/dashboard", "/dashboard/tasks"]
+  isCustom    Boolean  @default(false)
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id             String            @id @default(cuid())
+  name           String?
+  email          String            @unique
+  emailVerified  DateTime?
+  hashedPassword String?
+  phone          String?
+  panNumber      String?           @unique  // PAN number for client login
+  birthDate      DateTime?         // Birth date for client login
+  status         UserStatus        @default(ACTIVE)
+  roleId         String?
+  role           Role?             @relation(fields: [roleId], references: [id])
+  employeeProfile EmployeeProfile? @relation("EmployeeProfileUser")
+  reports        EmployeeProfile[] @relation("EmployeeReportsTo")
+  inquiries      ClientInquiry[]   @relation("InquiryCreator")
+  assignedInquiries ClientInquiry[] @relation("InquiryAssignee")
+  tasksCreated   Task[]            @relation("TaskCreatedBy")
+  tasksAssigned  Task[]            @relation("TaskAssignedTo")
+  attendances    Attendance[]
+  timesheetEntries TimesheetEntry[]
+  accounts       Account[]
+  sessions       Session[]
+  
+  // Client Portal Relations
+  clientDocuments      ClientDocument[]  @relation("ClientDocuments")
+  reviewedDocuments    ClientDocument[]  @relation("DocumentReviewer")
+  clientMessages       ClientMessage[]   @relation("ClientMessages")
+  sentMessages         ClientMessage[]   @relation("MessageSender")
+  
+  // Live Chat Relations
+  clientChatRooms      ChatRoom[]        @relation("ClientChatRooms")
+  assignedChatRooms    ChatRoom[]        @relation("AssignedChatRooms")
+  chatMessagesSent     ChatMessage[]     @relation("ChatMessageSender")
+  clientMeetings       ScheduledMeeting[] @relation("ClientMeetings")
+  hostedMeetings       ScheduledMeeting[] @relation("HostedMeetings")
+  
+  // WhatsApp Relations
+  whatsappContact      WhatsAppContact?  @relation("WhatsAppClient")
+  whatsappMessagesSent WhatsAppMessage[] @relation("WhatsAppSender")
+  whatsappTemplates    WhatsAppTemplate[] @relation("TemplateCreator")
+  whatsappBroadcasts   WhatsAppBroadcast[] @relation("BroadcastCreator")
+  
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model EmployeeProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  designation    String?
+  department     String?
+  joiningDate    DateTime?
+  officeLocation String?
+  reportingToId  String?
+  reportingTo    User?    @relation("EmployeeReportsTo", fields: [reportingToId], references: [id])
+  user           User     @relation("EmployeeProfileUser", fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ClientInquiry {
+  id            String          @id @default(cuid())
+  clientName    String
+  organization  String?
+  email         String
+  phone         String?
+  serviceType   ServiceType
+  status        InquiryStatus   @default(NEW)
+  priority      InquiryPriority @default(MEDIUM)
+  referenceCode String          @unique
+  message       String?
+  source        String?
+  createdById   String?
+  createdBy     User?           @relation("InquiryCreator", fields: [createdById], references: [id])
+  assignedToId  String?
+  assignedTo    User?           @relation("InquiryAssignee", fields: [assignedToId], references: [id])
+  followUpDate  DateTime?
+  notes         String?
+  tasks         Task[]          @relation("InquiryTasks")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([status, priority])
+  @@index([assignedToId])
+}
+
+model Task {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  serviceType  ServiceType?
+  status       TaskStatus   @default(NOT_STARTED)
+  priority     TaskPriority @default(NORMAL)
+  dueDate      DateTime?
+  clientName   String?
+  createdById  String
+  createdBy    User         @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  assigneeId   String?
+  assignee     User?        @relation("TaskAssignedTo", fields: [assigneeId], references: [id])
+  inquiryId    String?
+  inquiry      ClientInquiry? @relation("InquiryTasks", fields: [inquiryId], references: [id])
+  remarks      String?
+  timesheetEntries TimesheetEntry[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([assigneeId, status])
+  @@index([dueDate])
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id])
+  date       DateTime
+  status     AttendanceStatus @default(PRESENT)
+  checkIn    DateTime?
+  checkOut   DateTime?
+  remarks    String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([userId, date])
+  @@index([date])
+}
+
+model TimesheetEntry {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  workDate      DateTime
+  clientName    String
+  serviceType   ServiceType?
+  taskId        String?
+  task          Task?       @relation(fields: [taskId], references: [id])
+  description   String?
+  hours         Decimal      @db.Decimal(5, 2)
+  isBillable    Boolean      @default(true)
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([userId, workDate])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============== CMS MODELS ==============
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentBlockType {
+  HERO
+  TEXT
+  IMAGE
+  GALLERY
+  CTA
+  TESTIMONIAL
+  FAQ
+  CONTACT_FORM
+  CUSTOM
+}
+
+model Page {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  description String?
+  status      PageStatus  @default(DRAFT)
+  isHomePage  Boolean     @default(false)
+  metaTitle   String?
+  metaDesc    String?
+  sections    PageSection[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  publishedAt DateTime?
+
+  @@index([status])
+  @@index([slug])
+}
+
+model PageSection {
+  id          String           @id @default(cuid())
+  pageId      String
+  page        Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  title       String?
+  type        ContentBlockType @default(TEXT)
+  content     Json?
+  order       Int              @default(0)
+  isVisible   Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([pageId, order])
+}
+
+model MediaAsset {
+  id          String   @id @default(cuid())
+  fileName    String
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  altText     String?
+  folder      String?
+  uploadedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([folder])
+  @@index([fileType])
+}
+
+model MenuItem {
+  id          String     @id @default(cuid())
+  label       String
+  url         String?
+  pageSlug    String?
+  parentId    String?
+  parent      MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id])
+  children    MenuItem[] @relation("MenuChildren")
+  order       Int        @default(0)
+  isVisible   Boolean    @default(true)
+  menuGroup   String     @default("main")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([menuGroup, order])
+}
+
+model ThemeSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  category    String   @default("general")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  category    String   @default("general")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model ContactSubmission {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String   @db.Text
+  source      String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model CareerApplication {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  role        String?
+  experience  String?
+  message     String?  @db.Text
+  resumeUrl   String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============== CLIENT PORTAL MODELS ==============
+
+enum DocumentType {
+  TAX_RETURN
+  FINANCIAL_STATEMENT
+  INVOICE
+  RECEIPT
+  CONTRACT
+  IDENTITY_PROOF
+  ADDRESS_PROOF
+  BANK_STATEMENT
+  GST_RETURN
+  TDS_CERTIFICATE
+  AUDIT_REPORT
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  REQUIRES_REVISION
+}
+
+model ClientDocument {
+  id            String         @id @default(cuid())
+  clientId      String
+  client        User           @relation("ClientDocuments", fields: [clientId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  documentType  DocumentType   @default(OTHER)
+  fileName      String
+  fileUrl       String
+  fileSize      Int            // in bytes
+  mimeType      String?
+  
+  financialYear String?        // e.g., "2023-24"
+  status        DocumentStatus @default(PENDING_REVIEW)
+  reviewNote    String?
+  
+  uploadedAt    DateTime       @default(now())
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewedBy    User?          @relation("DocumentReviewer", fields: [reviewedById], references: [id])
+  
+  isFromFirm    Boolean        @default(false) // true = uploaded by firm for client
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([clientId])
+  @@index([documentType])
+  @@index([status])
+  @@index([financialYear])
+}
+
+model ClientMessage {
+  id          String   @id @default(cuid())
+  clientId    String
+  client      User     @relation("ClientMessages", fields: [clientId], references: [id], onDelete: Cascade)
+  
+  senderId    String
+  sender      User     @relation("MessageSender", fields: [senderId], references: [id])
+  
+  subject     String
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  isFromClient Boolean @default(true) // true = from client, false = from firm
+  
+  parentId    String?
+  parent      ClientMessage?  @relation("MessageReplies", fields: [parentId], references: [id])
+  replies     ClientMessage[] @relation("MessageReplies")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([senderId])
+  @@index([isRead])
+}
+
+// ============== LIVE CHAT SYSTEM ==============
+
+enum ChatRoomStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+model ChatRoom {
+  id          String         @id @default(cuid())
+  clientId    String
+  client      User           @relation("ClientChatRooms", fields: [clientId], references: [id], onDelete: Cascade)
+  
+  assignedToId String?
+  assignedTo   User?         @relation("AssignedChatRooms", fields: [assignedToId], references: [id])
+  
+  subject     String?
+  status      ChatRoomStatus @default(ACTIVE)
+  lastMessageAt DateTime?
+  
+  messages    ChatMessage[]
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([clientId])
+  @@index([assignedToId])
+  @@index([status])
+}
+
+enum MessageType {
+  TEXT
+  FILE
+  IMAGE
+  CALL_STARTED
+  CALL_ENDED
+  MEETING_SCHEDULED
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  chatRoomId  String
+  chatRoom    ChatRoom    @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  
+  senderId    String
+  sender      User        @relation("ChatMessageSender", fields: [senderId], references: [id])
+  
+  content     String?     @db.Text
+  messageType MessageType @default(TEXT)
+  
+  // File attachment fields
+  fileName    String?
+  fileUrl     String?
+  fileSize    Int?
+  mimeType    String?
+  
+  isRead      Boolean     @default(false)
+  readAt      DateTime?
+  
+  createdAt   DateTime    @default(now())
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model ScheduledMeeting {
+  id          String   @id @default(cuid())
+  clientId    String
+  client      User     @relation("ClientMeetings", fields: [clientId], references: [id], onDelete: Cascade)
+  
+  hostId      String
+  host        User     @relation("HostedMeetings", fields: [hostId], references: [id])
+  
+  title       String
+  description String?
+  meetingUrl  String   // Jitsi/Meet URL
+  
+  scheduledAt DateTime
+  duration    Int      @default(30) // minutes
+  
+  status      String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([hostId])
+  @@index([scheduledAt])
+}
+
+// ============== WHATSAPP MESSAGING SYSTEM ==============
+
+enum WhatsAppMessageStatus {
+  PENDING
+  SCHEDULED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum WhatsAppMessageType {
+  TEXT
+  IMAGE
+  DOCUMENT
+  TEMPLATE
+}
+
+model WhatsAppContact {
+  id            String   @id @default(cuid())
+  phoneNumber   String   @unique // Format: 919876543210
+  name          String?
+  
+  // Link to client if exists
+  clientId      String?  @unique
+  client        User?    @relation("WhatsAppClient", fields: [clientId], references: [id])
+  
+  // Contact groups/tags
+  tags          String[] @default([])
+  
+  isOptedIn     Boolean  @default(true) // GDPR compliance
+  lastMessageAt DateTime?
+  
+  messages      WhatsAppMessage[] @relation("ContactMessages")
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([phoneNumber])
+  @@index([clientId])
+}
+
+model WhatsAppMessage {
+  id            String                @id @default(cuid())
+  
+  contactId     String
+  contact       WhatsAppContact       @relation("ContactMessages", fields: [contactId], references: [id], onDelete: Cascade)
+  
+  // Sender (staff/admin)
+  senderId      String?
+  sender        User?                 @relation("WhatsAppSender", fields: [senderId], references: [id])
+  
+  messageType   WhatsAppMessageType   @default(TEXT)
+  content       String                @db.Text
+  mediaUrl      String?               // For images/documents
+  
+  // For template messages
+  templateName  String?
+  templateParams String[]             @default([])
+  
+  isIncoming    Boolean               @default(false) // true = from client
+  status        WhatsAppMessageStatus @default(PENDING)
+  
+  // External message ID from WhatsApp API
+  externalId    String?
+  
+  // Scheduling
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+  failedReason  String?
+  
+  createdAt     DateTime              @default(now())
+
+  @@index([contactId])
+  @@index([senderId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model WhatsAppTemplate {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  content       String   @db.Text // With {{1}}, {{2}} placeholders
+  category      String   @default("MARKETING") // MARKETING, UTILITY, AUTHENTICATION
+  language      String   @default("en")
+  
+  // Approval status from WhatsApp
+  isApproved    Boolean  @default(false)
+  externalId    String?  // Template ID from WhatsApp API
+  
+  createdById   String
+  createdBy     User     @relation("TemplateCreator", fields: [createdById], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model WhatsAppBroadcast {
+  id            String   @id @default(cuid())
+  name          String
+  
+  // Target contacts (by tags or all)
+  targetTags    String[] @default([])
+  targetAll     Boolean  @default(false)
+  
+  messageType   WhatsAppMessageType @default(TEXT)
+  content       String   @db.Text
+  templateName  String?
+  templateParams String[] @default([])
+  mediaUrl      String?
+  
+  // Scheduling
+  scheduledAt   DateTime?
+  
+  // Stats
+  totalContacts Int      @default(0)
+  sentCount     Int      @default(0)
+  deliveredCount Int     @default(0)
+  failedCount   Int      @default(0)
+  
+  status        String   @default("DRAFT") // DRAFT, SCHEDULED, SENDING, COMPLETED, CANCELLED
+  
+  createdById   String
+  createdBy     User     @relation("BroadcastCreator", fields: [createdById], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+}

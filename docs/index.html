@@ -1,0 +1,378 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R V P J & Co. - Platform Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #0F766E;
+            --primary-dark: #115E59;
+            --bg-light: #F8FAFC;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .lang-switcher {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+        
+        .sidebar h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar a:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        h3 {
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+        
+        code {
+            background: var(--bg-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        pre code {
+            background: none;
+            color: inherit;
+        }
+        
+        .card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .warning {
+            background: #FEF3C7;
+            border-left-color: #F59E0B;
+        }
+        
+        .info {
+            background: #DBEAFE;
+            border-left-color: #3B82F6;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">R V P J & Co.</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+                <button class="lang-btn" onclick="switchLanguage('gu')">ગુજરાતી</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h3 data-en="Documentation" data-gu="દસ્તાવેજીકરણ">Documentation</h3>
+            <ul>
+                <li><a href="#overview" onclick="showSection('overview')" data-en="Overview" data-gu="વિહંગાવલોકન">Overview</a></li>
+                <li><a href="#features" onclick="showSection('features')" data-en="Features" data-gu="સુવિધાઓ">Features</a></li>
+                <li><a href="#getting-started" onclick="showSection('getting-started')" data-en="Getting Started" data-gu="શરૂઆત કરો">Getting Started</a></li>
+                <li><a href="#admin-guide" onclick="showSection('admin-guide')" data-en="Admin Guide" data-gu="એડમિન માર્ગદર્શિકા">Admin Guide</a></li>
+                <li><a href="#client-guide" onclick="showSection('client-guide')" data-en="Client Guide" data-gu="ક્લાયંટ માર્ગદર્શિકા">Client Guide</a></li>
+                <li><a href="#calculators" onclick="showSection('calculators')" data-en="Calculators" data-gu="કેલ્ક્યુલેટર">Calculators</a></li>
+                <li><a href="#support" onclick="showSection('support')" data-en="Support" data-gu="સહાયતા">Support</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <h1 data-en="Platform Documentation" data-gu="પ્લેટફોર્મ દસ્તાવેજીકરણ">Platform Documentation</h1>
+                <p data-en="Complete documentation for R V P J & Co. CMS Platform" data-gu="R V P J & Co. CMS પ્લેટફોર્મ માટે સંપૂર્ણ દસ્તાવેજીકરણ">Complete documentation for R V P J & Co. CMS Platform</p>
+                
+                <h2 data-en="What is this platform?" data-gu="આ પ્લેટફોર્મ શું છે?">What is this platform?</h2>
+                <p data-en="R V P J & Co. Platform is a comprehensive content management system designed for chartered accountancy firms." data-gu="R V P J & Co. પ્લેટફોર્મ ચાર્ટર્ડ એકાઉન્ટન્સી ફર્મ માટે ડિઝાઇન કરેલ વ્યાપક સામગ્રી વ્યવસ્થાપન સિસ્ટમ છે.">R V P J & Co. Platform is a comprehensive content management system designed for chartered accountancy firms.</p>
+                
+                <h3 data-en="Three Main Portals" data-gu="ત્રણ મુખ્ય પોર્ટલ">Three Main Portals</h3>
+                <div class="card">
+                    <h4 data-en="1. Public Website" data-gu="1. સાર્વજનિક વેબસાઇટ">1. Public Website</h4>
+                    <p data-en="Marketing and information portal for visitors" data-gu="મુલાકાતીઓ માટે માર્કેટિંગ અને માહિતી પોર્ટલ">Marketing and information portal for visitors</p>
+                </div>
+                
+                <div class="card">
+                    <h4 data-en="2. Admin Dashboard" data-gu="2. એડમિન ડેશબોર્ડ">2. Admin Dashboard</h4>
+                    <p data-en="Staff and management portal for internal operations" data-gu="આંતરિક કામગીરી માટે સ્ટાફ અને મેનેજમેન્ટ પોર્ટલ">Staff and management portal for internal operations</p>
+                </div>
+                
+                <div class="card">
+                    <h4 data-en="3. Client Portal" data-gu="3. ક્લાયંટ પોર્ટલ">3. Client Portal</h4>
+                    <p data-en="Secure portal for client communication and documents" data-gu="ક્લાયંટ સંચાર અને દસ્તાવેજો માટે સુરક્ષિત પોર્ટલ">Secure portal for client communication and documents</p>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="section">
+                <h1 data-en="Platform Features" data-gu="પ્લેટફોર્મ સુવિધાઓ">Platform Features</h1>
+                
+                <h2 data-en="Public Website Features" data-gu="સાર્વજનિક વેબસાઇટ સુવિધાઓ">Public Website Features</h2>
+                <ul>
+                    <li data-en="Services information pages" data-gu="સેવાઓની માહિતી પૃષ્ઠો">Services information pages</li>
+                    <li data-en="13+ Financial calculators (GST, Income Tax, EMI, SIP, RERA, etc.)" data-gu="13+ નાણાકીય કેલ્ક્યુલેટર (GST, આવકવેરો, EMI, SIP, RERA, વગેરે)">13+ Financial calculators (GST, Income Tax, EMI, SIP, RERA, etc.)</li>
+                    <li data-en="Knowledge bank and resources" data-gu="જ્ઞાન બેંક અને સંસાધનો">Knowledge bank and resources</li>
+                    <li data-en="Career portal with job listings" data-gu="નોકરીની યાદી સાથે કારકિર્દી પોર્ટલ">Career portal with job listings</li>
+                    <li data-en="Contact and enquiry forms" data-gu="સંપર્ક અને પૂછપરછ ફોર્મ">Contact and enquiry forms</li>
+                    <li data-en="Mobile responsive design" data-gu="મોબાઇલ રિસ્પોન્સિવ ડિઝાઇન">Mobile responsive design</li>
+                </ul>
+                
+                <h2 data-en="Admin Dashboard Features" data-gu="એડમિન ડેશબોર્ડ સુવિધાઓ">Admin Dashboard Features</h2>
+                <ul>
+                    <li data-en="User management with role-based access" data-gu="ભૂમિકા-આધારિત ઍક્સેસ સાથે વપરાશકર્તા વ્યવસ્થાપન">User management with role-based access</li>
+                    <li data-en="Dashboard analytics and overview" data-gu="ડેશબોર્ડ વિશ્લેષણ અને વિહંગાવલોકન">Dashboard analytics and overview</li>
+                    <li data-en="Live chat management system" data-gu="લાઇવ ચેટ વ્યવસ્થાપન સિસ્ટમ">Live chat management system</li>
+                    <li data-en="WhatsApp bulk messaging and broadcasts" data-gu="WhatsApp બલ્ક મેસેજિંગ અને બ્રોડકાસ્ટ">WhatsApp bulk messaging and broadcasts</li>
+                    <li data-en="Client document management" data-gu="ક્લાયંટ દસ્તાવેજ વ્યવસ્થાપન">Client document management</li>
+                    <li data-en="Content management system" data-gu="સામગ્રી વ્યવસ્થાપન સિસ્ટમ">Content management system</li>
+                    <li data-en="Task and project management" data-gu="કાર્ય અને પ્રોજેક્ટ વ્યવસ્થાપન">Task and project management</li>
+                    <li data-en="Staff attendance tracking" data-gu="સ્ટાફ હાજરી ટ્રેકિંગ">Staff attendance tracking</li>
+                </ul>
+                
+                <h2 data-en="Client Portal Features" data-gu="ક્લાયંટ પોર્ટલ સુવિધાઓ">Client Portal Features</h2>
+                <ul>
+                    <li data-en="Secure login with PAN & Birth Date" data-gu="PAN અને જન્મ તારીખ સાથે સુરક્ષિત લોગિન">Secure login with PAN & Birth Date</li>
+                    <li data-en="Document upload and management" data-gu="દસ્તાવેજ અપલોડ અને વ્યવસ્થાપન">Document upload and management</li>
+                    <li data-en="Live chat with staff" data-gu="સ્ટાફ સાથે લાઇવ ચેટ">Live chat with staff</li>
+                    <li data-en="Video/voice calls integration" data-gu="વિડિઓ/વૉઇસ કૉલ એકીકરણ">Video/voice calls integration</li>
+                    <li data-en="Meeting scheduler" data-gu="મીટિંગ શિડ્યુલર">Meeting scheduler</li>
+                    <li data-en="Download forms and resources" data-gu="ફોર્મ અને સંસાધનો ડાઉનલોડ કરો">Download forms and resources</li>
+                </ul>
+            </section>
+
+            <!-- Getting Started Section -->
+            <section id="getting-started" class="section">
+                <h1 data-en="Getting Started" data-gu="શરૂઆત કરો">Getting Started</h1>
+                
+                <h2 data-en="System Requirements" data-gu="સિસ્ટમ જરૂરિયાતો">System Requirements</h2>
+                <ul>
+                    <li data-en="Modern web browser (Chrome, Firefox, Safari, Edge)" data-gu="આધુનિક વેબ બ્રાઉઝર (Chrome, Firefox, Safari, Edge)">Modern web browser (Chrome, Firefox, Safari, Edge)</li>
+                    <li data-en="Stable internet connection" data-gu="સ્થિર ઇન્ટરનેટ કનેક્શન">Stable internet connection</li>
+                    <li data-en="For mobile: Android 8+ or iOS 12+" data-gu="મોબાઇલ માટે: Android 8+ અથવા iOS 12+">For mobile: Android 8+ or iOS 12+</li>
+                </ul>
+                
+                <h2 data-en="Login URLs" data-gu="લોગિન URL">Login URLs</h2>
+                <div class="card info">
+                    <p data-en="<strong>Public Website:</strong> https://rvpj.in" data-gu="<strong>સાર્વજનિક વેબસાઇટ:</strong> https://rvpj.in"><strong>Public Website:</strong> https://rvpj.in</p>
+                    <p data-en="<strong>Admin Login:</strong> https://rvpj.in/login" data-gu="<strong>એડમિન લોગિન:</strong> https://rvpj.in/login"><strong>Admin Login:</strong> https://rvpj.in/login</p>
+                    <p data-en="<strong>Client Login:</strong> https://rvpj.in/client-login" data-gu="<strong>ક્લાયંટ લોગિન:</strong> https://rvpj.in/client-login"><strong>Client Login:</strong> https://rvpj.in/client-login</p>
+                </div>
+                
+                <h2 data-en="First Time Setup" data-gu="પ્રથમ વખત સેટઅપ">First Time Setup</h2>
+                <h3 data-en="For Admin/Staff" data-gu="એડમિન/સ્ટાફ માટે">For Admin/Staff</h3>
+                <ol>
+                    <li data-en="Receive your email and password from system administrator" data-gu="સિસ્ટમ એડમિનિસ્ટ્રેટર પાસેથી તમારું ઇમેઇલ અને પાસવર્ડ મેળવો">Receive your email and password from system administrator</li>
+                    <li data-en="Go to https://rvpj.in/login" data-gu="https://rvpj.in/login પર જાઓ">Go to https://rvpj.in/login</li>
+                    <li data-en="Enter your credentials" data-gu="તમારી ઓળખપત્રો દાખલ કરો">Enter your credentials</li>
+                    <li data-en="Click 'Sign In'" data-gu="'સાઇન ઇન' પર ક્લિક કરો">Click 'Sign In'</li>
+                </ol>
+                
+                <h3 data-en="For Clients" data-gu="ક્લાયંટ માટે">For Clients</h3>
+                <ol>
+                    <li data-en="Receive your PAN number and birth date details" data-gu="તમારું PAN નંબર અને જન્મ તારીખની વિગતો મેળવો">Receive your PAN number and birth date details</li>
+                    <li data-en="Go to https://rvpj.in/client-login" data-gu="https://rvpj.in/client-login પર જાઓ">Go to https://rvpj.in/client-login</li>
+                    <li data-en="Enter PAN number (uppercase, e.g., ABCDE1234F)" data-gu="PAN નંબર દાખલ કરો (અપરકેસમાં, દા.ત., ABCDE1234F)">Enter PAN number (uppercase, e.g., ABCDE1234F)</li>
+                    <li data-en="Enter birth date" data-gu="જન્મ તારીખ દાખલ કરો">Enter birth date</li>
+                    <li data-en="Click 'Login'" data-gu="'લોગિન' પર ક્લિક કરો">Click 'Login'</li>
+                </ol>
+            </section>
