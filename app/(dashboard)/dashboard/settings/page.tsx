@@ -35,8 +35,8 @@ export default function SiteSettingsPage() {
 
   const loadSettings = async () => {
     const result = await getSiteSettings();
-    if (result.settings) {
-      const s = result.settings;
+    if (result.settings && typeof result.settings === 'object' && 'siteName' in result.settings) {
+      const s = result.settings as Record<string, string>;
       setSettings({
         siteName: s.siteName || defaultSettings.siteName,
         siteTagline: s.siteTagline || defaultSettings.siteTagline,
